@@ -362,3 +362,129 @@ $errorReportPath = Join-Path -Path $eventLogPath -ChildPath "RecentErrors.txt"
 $recentErrors | Format-Table -AutoSize | Out-String | Set-Content -Path $errorReportPath
 
 Write-Output "Server information and event logs have been exported to $auditFolder"
+
+# Attempt to run domain administration tasks
+try {
+    # PowerShell Script to Collect Information for Domain Administration
+
+    # Define the path to the "audit" folder on the desktop
+    $auditPath = Join-Path -Path $desktopPath -ChildPath "audit"
+
+    # Create the "audit" folder if it doesn't exist
+    if (-Not (Test-Path -Path $auditPath)) {
+        New-Item -Path $auditPath -ItemType Directory | Out-Null
+    }
+
+    # Import Active Directory Module
+    Import-Module ActiveDirectory
+
+    # Collect information
+    $domainAdmins = Get-ADGroupMember -Identity "Domain Admins" | Select-Object -ExpandProperty Name
+    $domainAdminNames = $domainAdmins -join "; "
+    $dhcpScope = Get-DhcpServerv4Scope
+    $dhcpScopeFull = foreach ($scope in $dhcpScope) {
+        $percentInUse = ($scope.ScopeStatistics.PercentageInUse)
+        [PSCustomObject]@{
+            ScopeId        = $scope.ScopeId
+            PercentInUse   = $percentInUse
+            NearlyFull     = if ($percentInUse -gt 80) { "Yes" } else { "No" }
+        }
+    }
+    $dhcpLeaseTime = Get-DhcpServerv4Scope | Select-Object ScopeId, LeaseDuration
+    $dnsStatus = if (Resolve-DnsName -Name "google.com" -ErrorAction SilentlyContinue) { "Yes" } else { "No" }
+    $computerName = [System.Environment]::MachineName
+    $secondDC = Get-ADDomainController -Filter {Name -ne $computerName} | Select-Object -First 1
+    $replicationStatus = if ($secondDC) {
+        if (Get-ADReplicationPartnerMetadata -Target $secondDC.HostName) {
+            "Working"
+        } else {
+            "Not Working"
+        }
+    } else {
+        "No second DC found."
+    }
+    $gpoCount = (Get-Gpo -All).Count
+    $userCount = (Get-ADUser -Filter *).Count
+    $deviceCount = (Get-ADComputer -Filter *).Count
+
+    # Combine information into a single CSV
+    $auditData = @()
+
+    # Add summary information
+    $auditData += [PSCustomObject]@{
+        DomainAdminNames     = $domainAdminNames
+        DomainAdminCount     = $domainAdmins.Count
+        DnsWorking           = $dnsStatus
+        ReplicationStatus    = $replicationStatus
+        GpoCount             = $gpoCount
+        UserCount            = $userCount
+        DeviceCount          = $deviceCount
+        ScopeId              = ''
+        PercentInUse         = ''
+        NearlyFull           = ''
+        LeaseDuration        = ''
+    }
+
+    # Add DHCP scope information
+    foreach ($scope in $dhcpScopeFull) {
+        $auditData += [PSCustomObject]@{
+            DomainAdminNames     = ''
+            DomainAdminCount     = ''
+            DnsWorking           = ''
+            ReplicationStatus    = ''
+            GpoCount             = ''
+            UserCount            = ''
+            DeviceCount          = ''
+            ScopeId              = $scope.ScopeId
+            PercentInUse         = $scope.PercentInUse
+            NearlyFull           = $scope.NearlyFull
+            LeaseDuration        = ''
+        }
+    }
+
+    # Add DHCP lease information
+    foreach ($lease in $dhcpLeaseTime) {
+        $auditData += [PSCustomObject]@{
+            DomainAdminNames     = ''
+            DomainAdminCount     = ''
+            DnsWorking           = ''
+            ReplicationStatus    = ''
+            GpoCount             = ''
+            UserCount            = ''
+            DeviceCount          = ''
+            ScopeId              = $lease.ScopeId
+            PercentInUse         = ''
+            NearlyFull           = ''
+            LeaseDuration        = $lease.LeaseDuration.TotalHours
+        }
+    }
+
+    # Export to a single CSV file
+    $auditData | Export-Csv -Path "$auditPath\Domain and related services information.csv" -NoTypeInformation
+
+    # Export last logged in users and computers
+    $lastLoggedInInfo = Get-ADUser -Filter * -Property LastLogonDate | Select-Object Name, LastLogonDate
+    $lastLoggedInInfo += Get-ADComputer -Filter * -Property LastLogonDate | Select-Object Name, LastLogonDate
+    $lastLoggedInInfo | Export-Csv -Path "$auditPath\LastLoggedInUsersAndComputers.csv" -NoTypeInformation
+
+    Write-Output "Exported audit information to $auditPath\Domain and related services information.csv"
+    Write-Output "Exported last logged in users and computers to $auditPath\LastLoggedInUsersAndComputers.csv"
+
+} catch {
+    $errorInfo = "could not complete - are you sure this is a domain controller?"
+    $auditData = [PSCustomObject]@{
+        DomainAdminNames     = $errorInfo
+        DomainAdminCount     = $errorInfo
+        DnsWorking           = $errorInfo
+        ReplicationStatus    = $errorInfo
+        GpoCount             = $errorInfo
+        UserCount            = $errorInfo
+        DeviceCount          = $errorInfo
+        ScopeId              = $errorInfo
+        PercentInUse         = $errorInfo
+        NearlyFull           = $errorInfo
+        LeaseDuration        = $errorInfo
+    }
+    $auditData | Export-Csv -Path "$auditPath\Domain and related services information.csv" -NoTypeInformation
+    Write-Output "Error: $errorInfo"
+}
