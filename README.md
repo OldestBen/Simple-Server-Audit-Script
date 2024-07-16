@@ -1,6 +1,6 @@
-# Server Audit Script
+# Server Audit and Domain Administration Script
 
-This PowerShell script collects various information about a server, including IP address, server roles, access methods, virtual machine status, uptime, OS version, CPU and RAM usage, drive information, shares, security software, Windows Defender status, RDP status, and recent errors from the event logs. The collected information is exported to CSV files and event logs are exported to XML files.
+This PowerShell script collects various information about a server and, if applicable, its domain controller. The collected data includes IP address, server roles, access methods, virtual machine status, uptime, OS version, CPU and RAM usage, drive information, shares, security software status, Windows Defender status, RDP status, and recent errors from event logs. For domain controllers, it also gathers domain administration information and last logged in users and computers. The results are exported to CSV files for easy analysis.
 
 ## Features
 
@@ -17,11 +17,15 @@ This PowerShell script collects various information about a server, including IP
 - Checks if Windows Defender is running
 - Checks if RDP is enabled
 - Exports recent errors from event logs to a text file
+- For domain controllers:
+  - Collects information on domain admins, DHCP scopes, DNS status, replication status, GPO count, user count, and device count
+  - Exports last logged in users and computers
 
 ## Prerequisites
 
 - PowerShell 5.1 or later
 - Necessary permissions to run PowerShell scripts and access system information
+- Active Directory PowerShell module installed (for domain administration tasks)
 
 ## Usage
 
@@ -32,25 +36,19 @@ This PowerShell script collects various information about a server, including IP
    ```powershell
    .\server_audit.ps1
 
-    The script will create an audit folder on the desktop and export the collected information to this folder.
+       The script will create an audit folder on the desktop and export the collected information to this folder.
 
-Output
+## Output
 
 The script generates the following output files in the audit folder on the desktop:
 
-   server_info.csv: Contains general server information, including IP address, server roles, access methods, virtual machine status, uptime, OS version, CPU and RAM usage, share count, security software, Windows Defender status, and RDP status.
-   drive_info.csv: Contains information about the server drives, including free space, used space, total size, status, and shares.
-   EventLogs\*.xml: Event logs for Application, Security, and System.
-   EventLogs\RecentErrors.txt: A text file with recent errors from the event logs.
+    server_info.csv: Contains general server information, including IP address, server roles, access methods, virtual machine status, uptime, OS version, CPU and RAM usage, share count, security software, Windows Defender status, and RDP status.
+    drive_info.csv: Contains information about the server drives, including free space, used space, total size, status, and shares.
+    EventLogs\*.xml: Event logs for Application, Security, and System.
+    EventLogs\RecentErrors.txt: A text file with recent errors from the event logs.
+    Domain and related services information.csv: Contains domain-related information, including domain admins, DHCP scopes, DNS status, replication status, GPO count, user count, and device count. If the script cannot complete properly, it writes "could not complete - are you sure this is a domain controller?" to this file.
+    LastLoggedInUsersAndComputers.csv: Contains the last logged in users and computers.
 
+## License
 
-
-##  License
-
-```markdown
-GNU GENERAL PUBLIC LICENSE
-Version 3, 29 June 2007
-
-...
-
-(The full text of the GPL v3 license can be found at https://www.gnu.org/licenses/gpl-3.0.txt)
+This project is licensed under the GPLv3 License - see the LICENSE.md file for details.
