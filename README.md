@@ -38,10 +38,10 @@ Output
 
 The script generates the following output files in the audit folder on the desktop:
 
-    server_info.csv: Contains general server information, including IP address, server roles, access methods, virtual machine status, uptime, OS version, CPU and RAM usage, share count, security software, Windows Defender status, and RDP status.
-    drive_info.csv: Contains information about the server drives, including free space, used space, total size, status, and shares.
-    EventLogs\*.xml: Event logs for Application, Security, and System.
-    EventLogs\RecentErrors.txt: A text file with recent errors from the event logs.
+   server_info.csv: Contains general server information, including IP address, server roles, access methods, virtual machine status, uptime, OS version, CPU and RAM usage, share count, security software, Windows Defender status, and RDP status.
+   drive_info.csv: Contains information about the server drives, including free space, used space, total size, status, and shares.
+   EventLogs\*.xml: Event logs for Application, Security, and System.
+   EventLogs\RecentErrors.txt: A text file with recent errors from the event logs.
 
 
 
