@@ -47,4 +47,4 @@ The script generates the following output files in the audit folder on the deskt
 
 ##  License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the GNU General Public License v3.0 - see the ./LICENSE.md file for details.
