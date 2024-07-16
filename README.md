@@ -47,4 +47,10 @@ The script generates the following output files in the audit folder on the deskt
 
 ##  License
 
-This project is licensed under the GNU General Public License v3.0 - see the ./LICENSE.md file for details.
+```markdown
+GNU GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
+
+...
+
+(The full text of the GPL v3 license can be found at https://www.gnu.org/licenses/gpl-3.0.txt)
