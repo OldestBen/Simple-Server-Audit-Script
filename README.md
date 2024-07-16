@@ -49,7 +49,7 @@ The script generates the following output files in the audit folder on the deskt
     EventLogs\RecentErrors.txt: A text file with recent errors from the event logs.
     Domain and related services information.csv: Contains domain-related information, including domain admins, DHCP scopes, DNS status, replication status, GPO count, user count, and device count. If the script cannot complete properly, it writes "could not complete - are you sure this is a domain controller?" to this file.
     LastLoggedInUsersAndComputers.csv: Contains the last logged in users and computers.
-    PrinterInformation.csv: Contains printer information, including printer names, locations, and server names.
+    PrinterInformation.csv: Contains printer information, including printer names, computer names, port names, and printer statuses.
 
 ## License
 
