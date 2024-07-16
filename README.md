@@ -1,6 +1,6 @@
 # Server Audit and Domain Administration Script
 
-This PowerShell script collects various information about a server and, if applicable, its domain controller. The collected data includes IP address, server roles, access methods, virtual machine status, uptime, OS version, CPU and RAM usage, drive information, shares, security software status, Windows Defender status, RDP status, and recent errors from event logs. For domain controllers, it also gathers domain administration information and last logged in users and computers. The results are exported to CSV files for easy analysis.
+This PowerShell script collects various information about a server and, if applicable, its domain controller. The collected data includes IP address, server roles, access methods, virtual machine status, uptime, OS version, CPU and RAM usage, drive information, shares, security software status, Windows Defender status, RDP status, and recent errors from event logs. For domain controllers, it also gathers domain administration information, last logged in users and computers, and printer information. The results are exported to CSV files for easy analysis.
 
 ## Features
 
@@ -20,6 +20,7 @@ This PowerShell script collects various information about a server and, if appli
 - For domain controllers:
   - Collects information on domain admins, DHCP scopes, DNS status, replication status, GPO count, user count, and device count
   - Exports last logged in users and computers
+  - Exports printer information
 
 ## Prerequisites
 
@@ -36,7 +37,7 @@ This PowerShell script collects various information about a server and, if appli
    ```powershell
    .\server_audit.ps1
 
-       The script will create an audit folder on the desktop and export the collected information to this folder.
+    The script will create an audit folder on the desktop and export the collected information to this folder.
 
 ## Output
 
@@ -48,6 +49,7 @@ The script generates the following output files in the audit folder on the deskt
     EventLogs\RecentErrors.txt: A text file with recent errors from the event logs.
     Domain and related services information.csv: Contains domain-related information, including domain admins, DHCP scopes, DNS status, replication status, GPO count, user count, and device count. If the script cannot complete properly, it writes "could not complete - are you sure this is a domain controller?" to this file.
     LastLoggedInUsersAndComputers.csv: Contains the last logged in users and computers.
+    PrinterInformation.csv: Contains printer information, including printer names, locations, and server names.
 
 ## License
 
