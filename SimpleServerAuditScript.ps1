@@ -467,8 +467,13 @@ try {
     $lastLoggedInInfo += Get-ADComputer -Filter * -Property LastLogonDate | Select-Object Name, LastLogonDate
     $lastLoggedInInfo | Export-Csv -Path "$auditPath\LastLoggedInUsersAndComputers.csv" -NoTypeInformation
 
+    # Export printer information
+    $printers = Get-Printer | Select-Object Name, ComputerName, PortName, PrinterStatus
+    $printers | Export-Csv -Path "$auditPath\PrinterInformation.csv" -NoTypeInformation
+
     Write-Output "Exported audit information to $auditPath\Domain and related services information.csv"
     Write-Output "Exported last logged in users and computers to $auditPath\LastLoggedInUsersAndComputers.csv"
+    Write-Output "Exported printer information to $auditPath\PrinterInformation.csv"
 
 } catch {
     $errorInfo = "could not complete - are you sure this is a domain controller?"
